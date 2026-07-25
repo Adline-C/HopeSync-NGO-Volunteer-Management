@@ -32,7 +32,7 @@ CLERK_SECRET_KEY = os.getenv('CLERK_SECRET_KEY')
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG') == 'True'
+DEBUG = True
 
 # Pulls the custom Render web address domain dynamically, falling back to localhost
 ALLOWED_HOSTS = ['*']
@@ -64,7 +64,10 @@ CSP_FRAME_SRC = (
     "https://*.clerk.accounts.dev",
 )
 # Application definition
-
+CLERK_EXCLUDE_PATHS = [
+    '/admin/*',
+    '/admin',
+]
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

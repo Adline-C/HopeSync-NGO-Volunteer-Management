@@ -6,18 +6,23 @@
     <title>{% block title %}NGO Volunteer Management System{% endblock %}</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font 'Press Start 2P' -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         brand: {
-                            50: '#f5f7ff',
-                            100: '#ebf0ff',
-                            500: '#4f46e5',
-                            600: '#4338ca',
-                            700: '#3730a3',
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
                         }
+                    },
+                    fontFamily: {
+                        sans: ['"Press Start 2P"', 'monospace'],
                     }
                 }
             }
@@ -37,6 +42,10 @@
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
+        /* Strict global 8-bit typography overrides */
+        body, text, button, a, h1, h2, h3, p, span {
+            font-family: 'Press Start 2P', monospace !important;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
@@ -47,20 +56,20 @@
             <div class="flex items-center justify-between h-16">
                 <!-- Logo / Branding -->
                 <a href="{% if user.is_authenticated %}{% url 'volunteer_dashboard' %}{% else %}{% url 'landing' %}{% endif %}" class="flex items-center gap-2 hover:opacity-90 transition">
-                    <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-md shadow-indigo-100">
+                    <div class="bg-emerald-600 text-white p-2 rounded-xl shadow-md shadow-emerald-100">
                         <i class="fa-solid fa-hands-holding-child text-xl"></i>
                     </div>
-                    <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-indigo-800 bg-clip-text text-transparent">
+                    <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent">
                         HopeSync
                     </span>
                 </a>
 
                 <!-- Navigation Links -->
                 <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
-                    <a href="{% url 'opportunity_list' %}" class="text-slate-600 hover:text-indigo-600 transition">
+                    <a href="{% url 'opportunity_list' %}" class="text-slate-600 hover:text-emerald-600 transition">
                         <i class="fa-solid fa-calendar-days mr-1.5"></i> Opportunities
                     </a>
-                    <a href="{% url 'volunteer_dashboard' %}" class="text-slate-600 hover:text-indigo-600 transition">
+                    <a href="{% url 'volunteer_dashboard' %}" class="text-slate-600 hover:text-emerald-600 transition">
                         <i class="fa-solid fa-gauge mr-1.5"></i> Dashboard
                     </a>
                 </nav>
@@ -70,7 +79,7 @@
                     {% if user.is_authenticated %}
                         <div class="flex flex-col items-end hidden sm:flex">
                             <span class="text-sm font-semibold text-slate-800">{{ user.first_name|default:user.username }}</span>
-                            <span class="text-xs text-indigo-600 font-medium px-2 py-0.5 bg-indigo-50 rounded-full border border-indigo-100 mt-0.5">
+                            <span class="text-xs text-emerald-600 font-medium px-2 py-0.5 bg-emerald-50 rounded-full border border-emerald-100 mt-0.5">
                                 {{ user.get_role_display }}
                             </span>
                         </div>
@@ -141,7 +150,7 @@ script.addEventListener('load', async function() {
 // ✅ Fixed: Swap the button for a direct link to bypass the third-party cookie loop entirely
 if (userButtonContainer) {
     userButtonContainer.innerHTML = `
-        <a href="https://complete-pelican-54.accounts.dev/sign-in?redirect_url=https://hopesync-production.up.railway.app/dashboard/" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2 px-4 rounded-xl shadow-md transition duration-150 inline-block text-center">
+        <a href="https://complete-pelican-54.accounts.dev/sign-in?redirect_url=https://hopesync-production.up.railway.app/dashboard/" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2 px-4 rounded-xl shadow-md transition duration-150 inline-block text-center">
             Sign In
         </a>
     `;
