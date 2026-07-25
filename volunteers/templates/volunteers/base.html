@@ -141,19 +141,18 @@ script.addEventListener('load', async function() {
 // ✅ Fixed: Swap the button for a direct link to bypass the third-party cookie loop entirely
 if (userButtonContainer) {
     userButtonContainer.innerHTML = `
-        <a href="https://complete-pelican-54.accounts.dev/sign-in" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2 px-4 rounded-xl shadow-md transition duration-150 inline-block text-center">
+        <a href="https://complete-pelican-54.accounts.dev/sign-in?redirect_url=https://hopesync-production.up.railway.app/dashboard/" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2 px-4 rounded-xl shadow-md transition duration-150 inline-block text-center">
             Sign In
         </a>
     `;
 }
 
         // Handle auto-login trigger query parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('login') === 'true') {
-            window.Clerk.openSignIn({
-                redirectUrl: '/dashboard/'
-            });
-        }
+// ✅ Fixed: Redirect auto-login parameters straight to the hosted portal
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('login') === 'true') {
+    window.location.href = "https://complete-pelican-54.accounts.dev/sign-in?redirect_url=https://hopesync-production.up.railway.app/dashboard/";
+}
     }
 
     // Inject token automatically to all HTMX requests
