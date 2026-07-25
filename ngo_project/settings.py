@@ -41,7 +41,28 @@ RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
+# settings.py
 
+# Allow Clerk scripts to execute
+CSP_SCRIPT_SRC = (
+    "'self'", 
+    "https://*.clerk.accounts.dev", 
+    "https://cdn.jsdelivr.net",
+    "https://unpkg.com",
+    "https://cdnjs.cloudflare.com",
+)
+
+# Allow backend API network connections to Clerk
+CSP_CONNECT_SRC = (
+    "'self'", 
+    "https://*.clerk.accounts.dev",
+)
+
+# Allow Clerk's iframe interfaces to load
+CSP_FRAME_SRC = (
+    "'self'", 
+    "https://*.clerk.accounts.dev",
+)
 # Application definition
 
 INSTALLED_APPS = [
