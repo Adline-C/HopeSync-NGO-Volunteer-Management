@@ -1,0 +1,146 @@
+{% extends 'volunteers/base.html' %}
+
+{% block title %}My Volunteer ID Card - HopeSync{% endblock %}
+
+{% block content %}
+<!-- 🚨 GLOBAL PRINT OVERRIDE STYLES 🚨 -->
+<style>
+    @media print {
+        /* Completely hide the outer navbar, header texts, and dashboard action buttons */
+        body > nav, 
+        body > header, 
+        div.flex.gap-4, 
+        h1, 
+        p.text-slate-500,
+        .mb-6,
+        .mt-6,
+        header,
+        nav {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+
+        /* Target the specific floating profile bar elements that bleed through */
+        div[class*="fixed"], div[class*="sticky"], .navbar {
+            display: none !important;
+        }
+
+        /* Center the card perfectly on the printing layout paper */
+        body {
+            background: #ffffff !important;
+            color: #000000 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .printable-card-page {
+            padding: 0 !important;
+            margin: 4rem auto !important;
+            max-width: 100% !important;
+            display: flex !important;
+            justify-content: center !important;
+            box-shadow: none !important;
+        }
+
+        /* Force modern browsers to accurately render your card backgrounds and text gradients */
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+    }
+</style>
+
+<div class="printable-card-page max-w-md mx-auto px-4 py-8 flex flex-col items-center">
+    <div class="mb-6 text-center">
+        <h1 class="text-2xl font-bold text-slate-800">Digital Volunteer ID</h1>
+        <p class="text-slate-500 text-sm mt-1">Present this QR code at events for quick check-in and attendance recording.</p>
+    </div>
+
+    <!-- Wallet-style ID Card container -->
+    <div class="w-full max-w-sm bg-gradient-to-b from-indigo-700 to-indigo-900 text-white rounded-3xl shadow-xl overflow-hidden border border-indigo-600/30 flex flex-col justify-between aspect-[2.5/4] sm:aspect-[3/5]">
+        
+        <!-- Header -->
+        <div class="px-6 py-5 border-b border-indigo-600/30 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="bg-white/10 p-1.5 rounded-lg">
+                    <i class="fa-solid fa-hands-holding-child text-lg text-emerald-400"></i>
+                </div>
+                <span class="font-bold tracking-wider text-sm bg-gradient-to-r from-emerald-400 to-white bg-clip-text text-transparent">HopeSync</span>
+            </div>
+            <span class="text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                ACTIVE
+            </span>
+        </div>
+
+        <!-- Body / QR Code Block -->
+        <div class="px-6 py-6 flex flex-col items-center justify-center flex-grow bg-slate-900/40">
+            <!-- Dynamic QR Code Target Container -->
+            <div class="bg-white p-4 rounded-2xl shadow-inner flex items-center justify-center border-4 border-indigo-500/20 w-[172px] h-[172px]" id="qrcode-container">
+                <img id="fallback-qr" 
+                     src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data={{ user.username|urlencode }}&color=0f172a" 
+                     alt="Volunteer QR Code ID" 
+                     class="w-[140px] h-[140px] block object-contain" />
+            </div>
+            <span class="text-[11px] font-mono tracking-widest text-indigo-200 mt-4 bg-indigo-950/40 px-3 py-1 rounded border border-indigo-800/30 break-all select-all">
+                ID: {{ user.username }}
+            </span>
+        </div>
+
+        <!-- Footer / Volunteer Details -->
+        <div class="px-6 py-5 bg-indigo-950 border-t border-indigo-900 flex flex-col gap-1">
+            <div class="flex flex-col">
+                <span class="text-[9px] uppercase tracking-widest text-indigo-400 font-bold">Volunteer</span>
+                <span class="text-base font-bold tracking-tight text-white leading-none mt-1">
+                    {% if user.first_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}
+                </span>
+                <span class="text-xs text-indigo-300 font-medium truncate mt-0.5">{{ user.email }}</span>
+            </div>
+            
+            <div class="flex justify-between items-center border-t border-indigo-900 pt-3 mt-2 text-[10px] text-indigo-400">
+                <span>Joined: {{ user.date_joined|date:"M Y" }}</span>
+                <span>Hours: {{ user.total_hours|floatformat:1 }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-6 flex gap-4 w-full max-w-sm justify-center">
+        <button onclick="window.print()" class="flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold py-2.5 px-4 rounded-xl shadow-sm transition">
+            <i class="fa-solid fa-print"></i> Print Badge
+        </button>
+        <a href="{% url 'volunteer_dashboard' %}" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-md transition">
+            <i class="fa-solid fa-arrow-left"></i> Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    window.addEventListener("load", function() {
+        const targetContainer = document.getElementById("qrcode-container");
+        const volunteerUID = "{{ user.username|escapejs }}";
+        
+        if (!targetContainer || !volunteerUID) return;
+
+        if (typeof QRCode !== 'undefined') {
+            try {
+                targetContainer.innerHTML = "";
+                new QRCode(targetContainer, {
+                    text: volunteerUID,
+                    width: 140,
+                    height: 140,
+                    colorDark : "#0f172a",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            } catch (error) {
+                console.warn("Client-side library fallback active.", error);
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'volunteers/base.html' %}
+
+{% block title %}Upcoming Opportunities - HopeSync{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Active Opportunities</h1>
+    <p class="text-slate-500 mt-1">Explore current shifts, projects, and events where your support is needed.</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for opportunity in opportunities %}
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between overflow-hidden">
+            <!-- Opportunity Header -->
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs font-semibold px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100">
+                        Active
+                    </span>
+                    <span class="text-slate-400 text-xs flex items-center">
+                        <i class="fa-solid fa-users mr-1"></i> Max: {{ opportunity.max_capacity }}
+                    </span>
+                </div>
+                
+                <h3 class="text-lg font-bold text-slate-800 hover:text-indigo-600 transition mb-2">
+                    {{ opportunity.title }}
+                </h3>
+                
+                <p class="text-slate-500 text-sm line-clamp-3 mb-4">
+                    {{ opportunity.description }}
+                </p>
+
+                <!-- Details List -->
+                <div class="space-y-2 border-t border-slate-100 pt-4 text-xs text-slate-600">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-clock text-indigo-500 w-4"></i>
+                        <span>{{ opportunity.start_time|date:"M d, Y P" }} - {{ opportunity.end_time|date:"P" }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot text-rose-500 w-4"></i>
+                        <span>{{ opportunity.location }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-user-tie text-slate-400 w-4"></i>
+                        <span>Organized by: <strong class="text-slate-700">{{ opportunity.creator.username }}</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opportunity Footer / Skills & Action -->
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 mt-auto">
+                <div class="mb-4">
+                    <span class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1.5">Required Skills</span>
+                    <div class="flex flex-wrap gap-1">
+                        {% for skill in opportunity.required_skills.all %}
+                            <span class="text-[10px] font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded border border-indigo-100">
+                                {{ skill.name }}
+                            </span>
+                        {% empty %}
+                            <span class="text-[10px] text-slate-400 italic">No skills required</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- HTMX Check-In Action -->
+                {% if user.is_authenticated and user.is_volunteer %}
+                    <div id="check-in-target-{{ opportunity.id }}" class="w-full">
+                        <button hx-post="{% url 'check_in' opportunity.id %}"
+                                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                                hx-target="#check-in-target-{{ opportunity.id }}"
+                                hx-swap="outerHTML"
+                                class="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs font-semibold py-2.5 px-4 rounded-xl shadow-md shadow-indigo-100 transition-all duration-150 flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-circle-check"></i> Check In to Shift
+                        </button>
+                    </div>
+                {% else %}
+                    <div class="text-center text-[11px] text-slate-400 italic py-2">
+                        Sign in as Volunteer to check in
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-span-full bg-white rounded-2xl border border-slate-100 shadow-sm p-12 text-center">
+            <div class="text-indigo-300 text-5xl mb-4">
+                <i class="fa-solid fa-calendar-xmark"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800">No active opportunities</h3>
+            <p class="text-slate-400 mt-1 text-sm">Please check back later or contact your NGO administrator.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

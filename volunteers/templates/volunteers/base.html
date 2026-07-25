@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NGO Volunteer Management System{% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f5f7ff',
+                            100: '#ebf0ff',
+                            500: '#4f46e5',
+                            600: '#4338ca',
+                            700: '#3730a3',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- HTMX CDN -->
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 glass-panel shadow-sm border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo / Branding -->
+                <a href="{% if user.is_authenticated %}{% url 'volunteer_dashboard' %}{% else %}{% url 'landing' %}{% endif %}" class="flex items-center gap-2 hover:opacity-90 transition">
+                    <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-md shadow-indigo-100">
+                        <i class="fa-solid fa-hands-holding-child text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-indigo-800 bg-clip-text text-transparent">
+                        HopeSync
+                    </span>
+                </a>
+
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+                    <a href="{% url 'opportunity_list' %}" class="text-slate-600 hover:text-indigo-600 transition">
+                        <i class="fa-solid fa-calendar-days mr-1.5"></i> Opportunities
+                    </a>
+                    <a href="{% url 'volunteer_dashboard' %}" class="text-slate-600 hover:text-indigo-600 transition">
+                        <i class="fa-solid fa-gauge mr-1.5"></i> Dashboard
+                    </a>
+                </nav>
+
+                <!-- User Meta & Roles -->
+                <div class="flex items-center gap-4">
+                    {% if user.is_authenticated %}
+                        <div class="flex flex-col items-end hidden sm:flex">
+                            <span class="text-sm font-semibold text-slate-800">{{ user.first_name|default:user.username }}</span>
+                            <span class="text-xs text-indigo-600 font-medium px-2 py-0.5 bg-indigo-50 rounded-full border border-indigo-100 mt-0.5">
+                                {{ user.get_role_display }}
+                            </span>
+                        </div>
+                    {% endif %}
+                    <div id="user-button-container" class="min-w-[80px] flex justify-end"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center text-slate-400 text-sm">
+            <p>&copy; 2026 HopeSync NGO Volunteer Management. Optimized final evaluation prototype.</p>
+        </div>
+    </footer>
+
+    <!-- Pass Django variables into hidden HTML inputs so JS can read them safely without syntax errors -->
+    <input type="hidden" id="django-clerk-key" value="{{ CLERK_PUBLISHABLE_KEY }}">
+    <input type="hidden" id="django-auth-status" value="{% if user.is_authenticated %}true{% else %}false{% endif %}">
+
+<script>
+        window.addEventListener('load', function () {
+            // Direct Literal Hardcode Bypass (No template variables required)
+            const publishableKey = "pk_test_Y29tcGxldGUtcGVsaWNhbi01NC5jbGVyay5hY2NvdW50cy5kZXYk";
+            const isDjangoAuthenticated = document.getElementById('django-auth-status').value === 'true';
+            
+            // Dynamically load Clerk JS SDK
+            const script = document.createElement('script');
+            script.setAttribute('data-clerk-publishable-key', publishableKey);
+            script.src = `https://${publishableKey.split('$')[0].replace('pk_test_', '')}.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js`;
+            script.async = true;
+            script.crossOrigin = 'anonymous';
+            
+script.addEventListener('load', async function() {
+    await window.Clerk.load();
+    
+    const userButtonContainer = document.getElementById('user-button-container');
+    
+    if (window.Clerk.user) {
+        // User is logged in! Sync token to Django headers
+        const token = await window.Clerk.session.getToken();
+        document.cookie = `__session=${token}; path=/; SameSite=Lax`;
+        
+        // Render the user logout button profile widget
+        if (userButtonContainer) {
+            window.Clerk.mountUserButton(userButtonContainer);
+        }
+
+        // If local user is anonymous, reload to let the middleware synchronize session
+        if (!isDjangoAuthenticated) {
+            window.location.reload();
+        }
+    } else {
+        // Clear cookie if session is cleared
+        if (document.cookie.includes('__session=')) {
+            document.cookie = '__session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+            if (isDjangoAuthenticated) {
+                window.location.reload();
+            }
+        }
+
+        // Render premium sign-in button in header
+        if (userButtonContainer) {
+            userButtonContainer.innerHTML = `
+                <button onclick="window.Clerk.openSignIn({ redirectUrl: '/dashboard/' })" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2 px-4 rounded-xl shadow-md transition duration-150">
+                    Sign In
+                </button>
+            `;
+        }
+
+        // Handle auto-login trigger query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('login') === 'true') {
+            window.Clerk.openSignIn({
+                redirectUrl: '/dashboard/'
+            });
+        }
+    }
+
+    // Inject token automatically to all HTMX requests
+    document.body.addEventListener('htmx:configRequest', async function(evt) {
+        if (window.Clerk.session) {
+            const token = await window.Clerk.session.getToken();
+            evt.detail.headers['Authorization'] = `Bearer ${token}`;
+        }
+    });
+});
+            
+            document.head.appendChild(script);
+        });
+    </script>

@@ -1,0 +1,75 @@
+{% extends 'volunteers/base.html' %}
+
+{% block title %}Welcome to HopeSync - Volunteer Management & Impact Tracking{% endblock %}
+
+{% block content %}
+<div class="relative overflow-hidden min-h-[80vh] flex flex-col justify-center">
+    
+    <!-- Hero Section -->
+    <div class="max-w-4xl mx-auto text-center px-4 py-16 sm:py-24">
+        <!-- Badge -->
+        <span class="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 mb-6">
+            <i class="fa-solid fa-sparkles text-indigo-500"></i> Empowering Communities Together
+        </span>
+        
+        <!-- Main Heading -->
+        <h1 class="text-4xl sm:text-6xl font-black text-slate-900 tracking-tight leading-none mb-6">
+            Syncing Volunteers with <span class="bg-gradient-to-r from-indigo-600 to-emerald-600 bg-clip-text text-transparent">Purpose & Impact</span>
+        </h1>
+        
+        <!-- Subtitle -->
+        <p class="text-lg sm:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed mb-8">
+            HopeSync helps community volunteers track service hours, generate verified digital credentials, and share post-shift impact reflections in a streamlined, gamified platform.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <button onclick="window.Clerk.openSignIn({ redirectUrl: '/dashboard/' })" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold py-3.5 px-8 rounded-2xl shadow-lg shadow-indigo-100 hover:shadow-indigo-200 transition-all duration-150 text-sm">
+                Get Started / Sign In
+            </button>
+            <a href="{% url 'opportunity_list' %}" class="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold py-3.5 px-8 rounded-2xl shadow-sm transition text-sm flex items-center justify-center gap-2">
+                Explore Shifts <i class="fa-solid fa-arrow-right text-slate-400"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Feature Grid Section -->
+    <div class="max-w-6xl mx-auto px-4 mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Feature 1: Digital ID -->
+        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-start gap-4">
+            <div class="bg-indigo-50 text-indigo-600 p-3 rounded-2xl">
+                <i class="fa-solid fa-id-card text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800">Digital Volunteer IDs</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+                Generate a dynamic personal ID card containing a scannable verification QR code to register attendance at events instantly.
+            </p>
+        </div>
+
+        <!-- Feature 2: Post-Shift Journaling -->
+        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-start gap-4">
+            <div class="bg-emerald-50 text-emerald-600 p-3 rounded-2xl">
+                <i class="fa-solid fa-book-open-reader text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800">Impact Reflection Journals</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+                Record personal milestones, upload shift photos, and document service stories to build a validated resume of community impact.
+            </p>
+        </div>
+
+        <!-- Feature 3: Gamified Levels -->
+        <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-start gap-4">
+            <div class="bg-amber-50 text-amber-600 p-3 rounded-2xl">
+                <i class="fa-solid fa-award text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800">Milestone Badges & Levels</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+                Earn levels dynamically based on hourly thresholds. Unlock premium achievements, display verified active streaks, and verify certifications.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
